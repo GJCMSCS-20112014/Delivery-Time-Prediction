@@ -11,7 +11,10 @@
 - `train_model.py`: trains a multiple linear regression model using built-in Python
 - `models/delivery_model.pkl`: generated saved model
 - `app.py`: local HTTP API and website
-- `templates/index.html`: user input interface
+- `templates/index.html`: user input interface and popup markup
+- `templates/style.css`: all interface styling, including the history table popup
+- `templates/script.js`: prediction form behavior and history table loading
+- `data/prediction_history.csv`: persistent local prediction history
 - `test_api.py`: API tests (five prediction/validation cases plus health check)
 
 ## Run it for the first time
@@ -50,7 +53,8 @@ The values below are illustrative; your actual estimate is calculated by the tra
 ## Endpoints
 - `GET /`: local user interface
 - `GET /health`: server and saved-model status
-- `POST /predict`: validates input and returns a JSON prediction
+- `POST /predict`: validates input, saves the prediction, and returns JSON
+- `GET /history`: returns saved predictions in newest-first order
 
 ## Important notes
 - The included records are synthetic sample data for an academic demonstration, not real courier records.
