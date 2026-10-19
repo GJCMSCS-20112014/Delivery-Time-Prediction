@@ -672,6 +672,7 @@ form.addEventListener('submit', async event => {
         document.getElementById('jsonOutput').textContent = JSON.stringify(data, null, 2);
 
         renderCard(data);
+        event.target.reset();
         openResult();
     } catch (e) {
         error.textContent = e.message + ' Make sure app.py is running.';

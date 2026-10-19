@@ -7,7 +7,7 @@
 - Uses Python standard-library modules only
 
 ## Project files
-- `data/delivery_dataset.csv`: 30 sample training records
+- `data/delivery_dataset.csv`: 200 sample training records
 - `train_model.py`: trains a multiple linear regression model using built-in Python
 - `models/delivery_model.pkl`: generated saved model
 - `app.py`: local HTTP API and website
