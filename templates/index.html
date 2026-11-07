@@ -13,7 +13,7 @@ body.modal-open{overflow:hidden}
 body::after{content:"";position:fixed;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.28) 0,rgba(0,0,0,.28) 1px,transparent 1px,transparent 3px);z-index:100}
 main{max-width:none;margin:0;padding:0}
 .panel{display:flex;flex-direction:column;min-height:100vh;background:var(--panel);border:0;border-radius:0;padding:0 28px 22px;box-shadow:inset 0 0 60px rgba(57,255,122,.04);overflow:hidden}
-.panel::before{content:"Created by Godfrey J. Cadelina.";display:block;margin:0 -28px 22px;padding:11px 0 11px 80px;border-bottom:1px solid var(--line);background:#0a1c11 radial-gradient(circle at 18px 50%,#ff5f56 0 5px,transparent 6px),radial-gradient(circle at 38px 50%,#ffbd2e 0 5px,transparent 6px),radial-gradient(circle at 58px 50%,#27c93f 0 5px,transparent 6px);background-repeat:no-repeat;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.panel::before{content:"Created by Godfrey J. Cadelina.";display:block;margin:0 -78px 22px;padding:11px 0 11px 80px;border-bottom:1px solid var(--line);background:#0a1c11 radial-gradient(circle at 18px 50%,#ff5f56 0 5px,transparent 6px),radial-gradient(circle at 38px 50%,#ffbd2e 0 5px,transparent 6px),radial-gradient(circle at 58px 50%,#27c93f 0 5px,transparent 6px);background-repeat:no-repeat;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:22px}
 h1{margin:0 0 6px;font-size:26px;color:var(--green);text-shadow:0 0 10px rgba(57,255,122,.55);letter-spacing:.5px}
 h1::before{content:"> ";color:var(--dim)}
@@ -156,7 +156,7 @@ form{grid-template-columns:1fr}
         <!-- Content -->
         <div class="content">
             <section class="card" id="viewPredict" role="tabpanel" aria-labelledby="tabPredict">
-                <h2>Predict delivery time</h2>
+                <h2>Predict Delivery Time</h2>
                 <p>Estimate minutes for a single delivery.</p>
                 <form id="predictionForm">
                     <div class="field full">
@@ -185,8 +185,8 @@ form{grid-template-columns:1fr}
             </section>
 
             <section class="card" id="viewCompare" role="tabpanel" aria-labelledby="tabCompare" hidden>
-                <h2>Compare transportation</h2>
-                <p>Compare the estimated time of two vehicle types. Results open in a popup.</p>
+                <h2>Compare Transportation</h2>
+                <p>Compare the estimated time of two vehicle types.</p>
                 <form id="compareForm">
                     <div class="field full"><label for="compare_customer">Customer Name</label><input id="compare_customer" maxlength="100" placeholder="e.g., Juan Dela Cruz" required></div>
                     <div class="field"><label for="compare_distance">Distance (km)</label><input id="compare_distance" type="number" min="0.1" max="1000" step="0.1" required></div>
@@ -198,8 +198,8 @@ form{grid-template-columns:1fr}
             </section>
 
             <section class="card" id="viewDelay" role="tabpanel" aria-labelledby="tabDelay" hidden>
-                <h2>Adjusted delivery time</h2>
-                <p>Add extra delay minutes to the model estimate. Results open in a popup.</p>
+                <h2>Adjusted Delivery Time</h2>
+                <p>Add extra delay minutes to the model estimate.</p>
                 <form id="delayForm">
                     <div class="field full"><label for="delay_customer">Customer Name</label><input id="delay_customer" maxlength="100" placeholder="e.g., Juan Dela Cruz" required></div>
                     <div class="field"><label for="delay_distance">Distance (km)</label><input id="delay_distance" type="number" min="0.1" max="1000" step="0.1" required></div>
@@ -413,6 +413,55 @@ resultModal.addEventListener('click', event => {
 const toolResult = document.getElementById('toolResult');
 const closeToolResult = document.getElementById('closeToolResult');
 
+/* Labels for the estimator popups. Edit the text on the right to rename a field. */
+const toolLabels = {
+    customer_name: 'Customer Name',
+    distance_km: 'Distance (km)',
+    weight_kg: 'Weight (kg)',
+    transportation: 'Transportation',
+
+    // Compare Transportation
+    transportation_1: 'Transportation (1)',
+    estimated_minutes_1: 'Estimated Minutes (1)',
+    transportation_2: 'Transportation (2)',
+    estimated_minutes_2: 'Estimated Minutes (2)',
+    difference_minutes: 'Difference (minutes)',
+    faster_transportation: 'Faster Transportation',
+
+    // Adjusted Delivery Time
+    model_predicted_minutes: 'Model Predicted (minutes)',
+    additional_delay_minutes: 'Additional Delay (minutes)',
+    adjusted_estimated_minutes: 'Adjusted Estimate (minutes)',
+    delivery_status: 'Delivery Status'
+};
+
+/* Comparison result: name full width, distance/weight, transport 1 left and
+   transport 2 right (each with its minutes), then difference and faster full width.
+   Adjusted delivery result (no *_1 / *_2 keys): name and transportation full width,
+   everything else keeps its original order and size. */
+function layoutToolEntries(data) {
+    const pairs = Object.keys(data).filter(k => /_1$/.test(k) && k.replace(/_1$/, '_2') in data);
+
+    if (!pairs.length) {
+        const delayFullKeys = ['customer_name', 'transportation'];
+        return Object.entries(data).map(([key, value]) => ({ key, value, full: delayFullKeys.includes(key) }));
+    }
+
+    const fullKeys = ['customer_name', 'difference_minutes', 'faster_transportation'];
+    const order = [];
+    const add = key => { if (key in data && !order.includes(key)) order.push(key); };
+
+    add('customer_name');
+    add('distance_km');
+    add('weight_kg');
+    pairs.forEach(key => { add(key); add(key.replace(/_1$/, '_2')); });
+    add('difference_minutes');
+    add('faster_transportation');
+    Object.keys(data).forEach(add);
+
+    return order.map(key => ({ key, value: data[key], full: fullKeys.includes(key) }));
+}
+
 function showToolResult(title, data, mainValue, summary) {
     document.getElementById('toolResultTitle').textContent = title;
     document.getElementById('toolSummary').textContent = summary;
@@ -421,12 +470,13 @@ function showToolResult(title, data, mainValue, summary) {
     const details = document.getElementById('toolDetails');
     details.replaceChildren();
 
-    Object.entries(data).forEach(([key, value]) => {
+    layoutToolEntries(data).forEach(({ key, value, full }) => {
         const item = document.createElement('div');
-        item.className = 'detail';
+        item.className = full ? 'detail full' : 'detail';
 
         const dt = document.createElement('dt');
-        dt.textContent = key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+        dt.textContent = toolLabels[key] ||
+            key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 
         const dd = document.createElement('dd');
         dd.textContent = String(value);
@@ -489,7 +539,7 @@ document.getElementById('compareForm').addEventListener('submit', e => {
         weight_kg: Number(document.getElementById('compare_weight').value),
         transportation_1: document.getElementById('transportation_1').value,
         transportation_2: document.getElementById('transportation_2').value
-    }, 'Transportation Comparison Result', d => `${d.faster_transportation === 'Tie' ? 'Both vehicles have the same estimate.' : d.faster_transportation + ' is faster by ' + d.difference_minutes + ' minutes.'}`);
+    }, 'Transportation Comparison Result', d => ``);
 });
 
 document.getElementById('delayForm').addEventListener('submit', e => {
@@ -500,7 +550,7 @@ document.getElementById('delayForm').addEventListener('submit', e => {
         weight_kg: Number(document.getElementById('delay_weight').value),
         transportation: document.getElementById('delay_transportation').value,
         additional_delay_minutes: Number(document.getElementById('additional_delay').value)
-    }, 'Adjusted Delivery Time Result', d => `Base model estimate: ${d.model_predicted_minutes} minutes. With ${d.additional_delay_minutes} additional minutes, the adjusted estimate is ${d.adjusted_estimated_minutes} minutes. Status: ${d.delivery_status}.`);
+    }, 'Adjusted Delivery Time Result', d => ``);
 });
 
 
