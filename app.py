@@ -145,7 +145,8 @@ class Handler(SimpleHTTPRequestHandler):
         self.send_json(404, {"error": "Not found"})
 
     def do_POST(self):
-        if urlparse(self.path).path != "/predict":
+        path = urlparse(self.path).path
+        if path not in ("/predict", "/compare-transport", "/delay-estimate"):
             self.send_json(404, {"error": "Not found"})
             return
 
@@ -182,10 +183,43 @@ class Handler(SimpleHTTPRequestHandler):
                     "and no more than 500 kg."
                 )
 
-            transport = str(data.get("transportation", ""))
             model = load_model()
-            minutes = predict(model, distance, weight, transport)
+            if path == "/compare-transport":
+                first = str(data.get("transportation_1", ""))
+                second = str(data.get("transportation_2", ""))
+                if not first or not second or first == second:
+                    raise ValueError("Choose two different transportation types.")
+                first_minutes = predict(model, distance, weight, first)
+                second_minutes = predict(model, distance, weight, second)
+                result = {
+                    "customer_name": name, "distance_km": distance, "weight_kg": weight,
+                    "transportation_1": first, "estimated_minutes_1": first_minutes,
+                    "transportation_2": second, "estimated_minutes_2": second_minutes,
+                    "difference_minutes": abs(first_minutes - second_minutes),
+                    "faster_transportation": first if first_minutes < second_minutes else second if second_minutes < first_minutes else "Tie"
+                }
+                self.send_json(200, result)
+                return
 
+            if path == "/delay-estimate":
+                transport = str(data.get("transportation", ""))
+                delay = float(data.get("additional_delay_minutes", 0))
+                if not math.isfinite(delay) or delay < 0 or delay > 100000:
+                    raise ValueError("Additional delay must be a nonnegative number of minutes.")
+                base_minutes = predict(model, distance, weight, transport)
+                result = {
+                    "customer_name": name, "distance_km": distance, "weight_kg": weight,
+                    "transportation": transport,
+                    "model_predicted_minutes": base_minutes,
+                    "additional_delay_minutes": delay,
+                    "adjusted_estimated_minutes": base_minutes + delay,
+                    "delivery_status": "ON ESTIMATE" if delay == 0 else "DELAY ADDED"
+                }
+                self.send_json(200, result)
+                return
+
+            transport = str(data.get("transportation", ""))
+            minutes = predict(model, distance, weight, transport)
             result = {
                 "customer_name": name,
                 "distance_km": distance,
@@ -193,10 +227,8 @@ class Handler(SimpleHTTPRequestHandler):
                 "transportation": transport,
                 "estimated_delivery_minutes": minutes,
             }
-
-            # Save the prediction before reporting success.
+            # Save base model predictions as well as delay-estimator records.
             save_prediction(result)
-
             self.send_json(200, result)
 
         except (ValueError, TypeError, json.JSONDecodeError) as e:
