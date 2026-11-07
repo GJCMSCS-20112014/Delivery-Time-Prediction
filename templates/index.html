@@ -161,15 +161,15 @@ form{grid-template-columns:1fr}
                 <form id="predictionForm">
                     <div class="field full">
                         <label for="customer_name">Customer Name</label>
-                        <input id="customer_name" name="customer_name" placeholder="e.g., Juan Dela Cruz" maxlength="100" required>
+                        <input id="customer_name" name="customer_name" placeholder="e.g., Godfrey J. Cadelina" maxlength="100" required>
                     </div>
                     <div class="field">
                         <label for="distance_km">Delivery Distance (km)</label>
-                        <input id="distance_km" name="distance_km" type="number" min="0.1" max="1000" step="0.1" placeholder="25" required>
+                        <input id="distance_km" name="distance_km" type="number" min="0.1" max="1000" step="0.1" placeholder="e.g., 25" required>
                     </div>
                     <div class="field">
                         <label for="weight_kg">Package Weight (kg)</label>
-                        <input id="weight_kg" name="weight_kg" type="number" min="0.1" max="500" step="0.1" placeholder="3" required>
+                        <input id="weight_kg" name="weight_kg" type="number" min="0.1" max="500" step="0.1" placeholder="e.g., 30" required>
                     </div>
                     <div class="field full">
                         <label>Transportation Type</label>
@@ -188,9 +188,9 @@ form{grid-template-columns:1fr}
                 <h2>Compare Transportation</h2>
                 <p>Compare the estimated time of two vehicle types.</p>
                 <form id="compareForm">
-                    <div class="field full"><label for="compare_customer">Customer Name</label><input id="compare_customer" maxlength="100" placeholder="e.g., Juan Dela Cruz" required></div>
-                    <div class="field"><label for="compare_distance">Distance (km)</label><input id="compare_distance" type="number" min="0.1" max="1000" step="0.1" required></div>
-                    <div class="field"><label for="compare_weight">Weight (kg)</label><input id="compare_weight" type="number" min="0.1" max="500" step="0.1" required></div>
+                    <div class="field full"><label for="compare_customer">Customer Name</label><input id="compare_customer" maxlength="100" placeholder="e.g., Godfrey J. Cadelina" required></div>
+                    <div class="field"><label for="compare_distance">Distance (km)</label><input id="compare_distance" type="number" min="0.1" max="1000" placeholder="e.g., 10" step="0.1" required></div>
+                    <div class="field"><label for="compare_weight">Weight (kg)</label><input id="compare_weight" type="number" min="0.1" max="500" placeholder="e.g., 20" step="0.1" required></div>
                     <div class="field"><label for="transportation_1">First Transportation</label><select id="transportation_1"><option>Motorcycle</option><option>Bicycle</option><option>Car</option><option>Van</option></select></div>
                     <div class="field"><label for="transportation_2">Second Transportation</label><select id="transportation_2"><option>Car</option><option>Van</option><option>Bicycle</option><option>Motorcycle</option></select></div>
                     <button type="submit" id="compareButton">Compare Transportation</button>
@@ -201,11 +201,11 @@ form{grid-template-columns:1fr}
                 <h2>Adjusted Delivery Time</h2>
                 <p>Add extra delay minutes to the model estimate.</p>
                 <form id="delayForm">
-                    <div class="field full"><label for="delay_customer">Customer Name</label><input id="delay_customer" maxlength="100" placeholder="e.g., Juan Dela Cruz" required></div>
-                    <div class="field"><label for="delay_distance">Distance (km)</label><input id="delay_distance" type="number" min="0.1" max="1000" step="0.1" required></div>
-                    <div class="field"><label for="delay_weight">Weight (kg)</label><input id="delay_weight" type="number" min="0.1" max="500" step="0.1" required></div>
+                    <div class="field full"><label for="delay_customer">Customer Name</label><input id="delay_customer" maxlength="100" placeholder="e.g., Godfrey J. Cadelina" required></div>
+                    <div class="field"><label for="delay_distance">Distance (km)</label><input id="delay_distance" type="number" min="0.1" max="1000" placeholder="e.g., 10" step="0.1" required></div>
+                    <div class="field"><label for="delay_weight">Weight (kg)</label><input id="delay_weight" type="number" min="0.1" max="500" placeholder="e.g., 20" step="0.1" required></div>
                     <div class="field"><label for="delay_transportation">Transportation</label><select id="delay_transportation"><option>Motorcycle</option><option>Bicycle</option><option>Car</option><option>Van</option></select></div>
-                    <div class="field"><label for="additional_delay">Additional Delay (minutes)</label><input id="additional_delay" type="number" min="0" max="100000" step="1" value="0" required></div>
+                    <div class="field"><label for="additional_delay">Additional Delay (minutes)</label><input id="additional_delay" type="number" min="0" max="100000" placeholder="e.g., 5" step="1" value="0" required></div>
                     <button type="submit" id="delayButton">Calculate Adjusted Time</button>
                 </form>
             </section>
