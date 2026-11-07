@@ -1,3 +1,4 @@
 __pycache__/
 *.py[cod]
 data/prediction_history.csv
+models/delivery_model.pkl
